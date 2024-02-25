@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: colab-runtime
+  namespace: colab-llm-cpu
+spec:
+  replicas: 1
+  strategy: 
+    type: Recreate 
+  selector:
+    matchLabels:
+      app: colab-runtime
+  template:
+    metadata:
+      labels:
+        app: colab-runtime
+    spec:
+      containers:
+      - name: colab-runtime
+        image: us-docker.pkg.dev/colab-images/public/runtime:latest
+        command:
+          - bash
+          - -ec
+          - |
+            rsync -avz /mnt/python-libs/ /usr/local/lib/python3.10/dist-packages/
+            /datalab/run.sh
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "20"
+            memory: "64Gi"
+          limits:
+            cpu: "20"
+            memory: "64Gi"
+        volumeMounts:
+        - name: colab-data
+          mountPath: /content
+        - name: colab-python-libs 
+          mountPath: /mnt/python-libs
+        lifecycle:
+          preStop:
+            exec:
+              command: 
+                - bash
+                - -ec
+                - |
+                  rsync -avz /usr/local/lib/python3.10/dist-packages/ /mnt/python-libs/
+      volumes:
+      - name: colab-data
+        persistentVolumeClaim:
+          claimName: colab-pvc-ssd
+      - name: colab-python-libs
+        persistentVolumeClaim:
+          claimName: colab-pvc-libs 
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: cloud.google.com/gke-nodepool
+                operator: In
+                values:
+                - large-pool-c3-spot

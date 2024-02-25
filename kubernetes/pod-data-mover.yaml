@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: data-mover
+  namespace: colab-llm-cpu
+spec:
+  volumes:
+    - name: old-pv
+      persistentVolumeClaim:
+        claimName: colab-pvc
+    - name: new-pv
+      persistentVolumeClaim:
+        claimName: colab-pvc-ssd
+  containers:
+    - name: data-mover
+      image: ubuntu
+      command: ["/bin/sh", "-c", "apt-get update && apt-get install -y rsync && rsync -av /old-data/ /new-data/"] 
+      volumeMounts:
+        - name: old-pv
+          mountPath: /old-data
+        - name: new-pv
+          mountPath: /new-data
