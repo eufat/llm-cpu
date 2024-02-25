@@ -4,13 +4,13 @@ This is an example of how to serve a simple optimized context aware LLM on CPU.
 
 ## Model Flow
 
-![](./model-flow.png)
+![model-flow-llm-cpu](./model-flow.png)
 
 An open-source LLM 7B model (Llama2, Mistral or Gemma) compressed and served with RAG for building an optimized context aware LLM on CPU. NNCF/IPEX used for compressing LLM into optimized model to inference on top of Intel CPU. Vector Stores used to storing and retrieving text data in a way that is efficient for augmenting LLM with RAG output. RAG with LangChain used for generating text that is relevant to a specific topic as LLM is provided with context for a question.
 
 ## System Flow
 
-![](./system-flow.png)
+![system-flow-llm-cpu](./system-flow.png)
 
 The above system diagram to use pre-trained large language models (LLMs) from Hugging Face in Google Colab Notebook or a sample Python application. The system uses Kubernetes and port forwarding to make the LLM models accessible to the notebook or application.
 
