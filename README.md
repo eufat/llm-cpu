@@ -108,3 +108,30 @@ Here's a breakdown of the steps involved:
     ```
     kubectl scale deployment colab-runtime --replicas=1 -n colab-llm-cpu
     ```
+7. (Optional) Create OVMS model server for model serving:
+
+    To create a OVMS model server we need to setup OVMS Kubernetes operator first:
+    ```
+    curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0
+    ```
+    ```
+    kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
+    ```
+    Vaildate either the OVMS operator already running or not:
+    ```
+    kubectl get csv -n operators
+    ```
+    We need to create OVMS model registry and place our models based on [this guide](https://docs.openvino.ai/2022.3/ovms_docs_models_repository.html), we use GCS for this:
+    ```
+    gsutil cp -r ./compressed-llama2-folder/ gs://bucket/llama2
+    ```
+    Create a GCP service account by follow [this guide](https://cloud.google.com/iam/docs/service-accounts-create), then assign Storage Bucket Viewer, Storage Object Viewer and Storage Object Roles, then save the creds key as `gcp-creds.json`. Create Kubernetes secret with respective key:
+    ```
+    kubectl create secret generic gcpcreds --from-file gcp-creds.json -n colab-llm-cpu
+    ```
+    Apply model server configuration to run the model server:
+    ```
+    kubectl apply -f model-server.yaml
+    ```
+
+
