@@ -10,11 +10,11 @@ spec:
     openshift_service_mesh: false
     resources:
       limits:
-        cpu: "1"
-        memory: "10Gi"
+        cpu: "20"
+        memory: "64Gi"
       requests:
-        cpu: "1"
-        memory: "10Gi"
+        cpu: "20"
+        memory: "64Gi"
     node_affinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 100
@@ -51,5 +51,5 @@ spec:
     service_type: ClusterIP
   models_repository:
     storage_type: "google"
-    gcp_creds_secret_name: gcpcreds
+    # gcp_creds_secret_name: gcpcreds
  

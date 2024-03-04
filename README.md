@@ -48,7 +48,7 @@ Here's a breakdown of the steps involved:
     ```
 3. Deploy Your LLM Runtime:
 
-    deployment.yaml describes how to run your LLM container:
+    deployment-runtime.yaml describes how to run your LLM container:
     - Image: The Docker image containing your LLM. We use colab runtime for this.
     - Command: Instructions to prepare container syncing files, libraries for your LLM notebook based on last backup.
     - Command (preStop): Syncing files, libraries your LLM as backup for next experimentation.
@@ -56,13 +56,13 @@ Here's a breakdown of the steps involved:
     - Resources: Specifies CPU and memory your LLM needs (we use 20vCPUs and 64GB for compressing and serving purpose).
     - VolumeMounts: Connects the PVCs you created to your container's filesystem.
     ```
-    kubectl apply -f deployment.yaml -n colab-llm-cpu 
+    kubectl apply -f deployment-runtime.yaml -n colab-llm-cpu 
     ```
 4. Expose and Access Your LLM Service:
 
     If you want to access your LLM from outside the cluster, create a Kubernetes Service.
     ```
-    kubectl apply -f service.yaml -n colab-llm-cpu 
+    kubectl apply -f service-runtime.yaml -n colab-llm-cpu 
     ```
     Forward your experimentation runtime to local.
     ```
@@ -134,4 +134,18 @@ Here's a breakdown of the steps involved:
     kubectl apply -f model-server.yaml
     ```
 
+    To check either the model ready or not:
+    ```
+    kubectl logs --follow ovms-llm-5d7d467588-twt5k -n colab-llm-cpu
+    ```
+    ```
+    ...
+    [2024-03-04 14:13:38.610][1][serving][info][modelinstance.cpp:824] Loaded model llm-llama; version: 1; batch size: -1; No of InferRequests: 1
+    [2024-03-04 14:13:38.610][1][serving][info][modelversionstatus.cpp:109] STATUS CHANGE: Version 1 of model llm-llama status change. New status: ( "state": "AVAILABLE", "error_code": "OK" )
+    [2024-03-04 14:13:38.610][1][serving][info][model.cpp:88] Updating default version for model: llm-llama, from: 0
+    [2024-03-04 14:13:38.610][1][serving][info][model.cpp:98] Updated default version for model: llm-llama, to: 1
+    [2024-03-04 14:13:38.614][1][serving][info][servablemanagermodule.cpp:55] ServableManagerModule started
+    [2024-03-04 14:13:38.615][168][modelmanager][info][modelmanager.cpp:1090] Started cleaner thread
+    ```
+    When the model is ready `( "state": "AVAILABLE", "error_code": "OK" )` should be outputted.
 
